@@ -6,9 +6,8 @@ const jitterWidth = 35
 const LEFT = 0,
       RIGHT = 1;
 
-const myColor1 = d3.scaleSequential()
-                  .interpolator(d3.interpolateInferno)
-                  .domain([,0]);
+const myColor = d3.scaleSequential()
+                  .interpolator(d3.interpolateInferno);
 
 const categories = ["Fruits",
                     "Vegetables",
@@ -105,9 +104,7 @@ function createJitterPlot(attribute, category1, category2){
        .call(d3.axisLeft(y)) 
 
 
-    const myColor = d3.scaleSequential()
-                  .interpolator(d3.interpolateInferno)
-                  .domain(yscales[attribute].reverse());
+    const color = myColor.domain(yscales[attribute].slice().reverse());
 
     // Draw the plot
     svg
@@ -118,7 +115,7 @@ function createJitterPlot(attribute, category1, category2){
       .attr("cx", (d) => x(d.category) - jitterWidth/2 + Math.random()*jitterWidth ) // onde se calculam as categorias 
       .attr("cy", (d) => y(d[key]))
       .attr("r", 3.5)
-      .style("fill", (d) => myColor(d[key]))
+      .style("fill", (d) => color(d[key]))
       .style("stroke", "black");
       // .on("mouseover", (event, d) => handleMouseOver(d))
       // .on("mouseleave", (event, d) => handleMouseLeave())
@@ -156,7 +153,9 @@ function updateJitterPlots(attribute, column, category1, category2){
       .domain(yscales[attribute])
       .range([height, 0])
 
-    svg.select(`#gYAxis-${attribute}`).call(d3.axisLeft(y)) 
+    svg.select(`#gYAxis-${attribute}`).call(d3.axisLeft(y));
+
+    const color = myColor.domain(yscales[attribute].slice().reverse());
 
     // Update the plot
     svg
@@ -170,7 +169,7 @@ function updateJitterPlots(attribute, column, category1, category2){
             .attr("cx", function(d){return(x(d.category) - jitterWidth/2 + Math.random()*jitterWidth )})
             .attr("cy", y(0))
             .attr("r", 4)
-            .style("fill", function(d){ return(myColor(d[key]))})
+            .style("fill", function(d){ return(color(d[key]))})
             .style("stroke", "black")
             // .on("mouseover", (event, d) => handleMouseOver(d))
             // .on("mouseleave", (event, d) => handleMouseLeave());
