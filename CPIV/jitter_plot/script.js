@@ -6,9 +6,9 @@ const jitterWidth = 35
 const LEFT = 0,
       RIGHT = 1;
 
-const myColor = d3.scaleSequential()
+const myColor1 = d3.scaleSequential()
                   .interpolator(d3.interpolateInferno)
-                  .domain([1000,0]);
+                  .domain([,0]);
 
 const categories = ["Fruits",
                     "Vegetables",
@@ -29,6 +29,7 @@ const yscales = { "calories" : [0, 1000],
                   "sodium" : [0, 3000],
                   "potassium" : [0, 1800]
 };
+
 
 function init(){
   createJitterPlot("calories", "Meat", "Fish");
@@ -102,6 +103,11 @@ function createJitterPlot(attribute, category1, category2){
     svg.append("g")
        .attr("id", `gYAxis-${attribute}`)
        .call(d3.axisLeft(y)) 
+
+
+    const myColor = d3.scaleSequential()
+                  .interpolator(d3.interpolateInferno)
+                  .domain(yscales[attribute].reverse());
 
     // Draw the plot
     svg
