@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Nutrient Database Explorer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="parallel.css" />
+  </head>
+  <body>
+  <div id="header">
+    <h1>Nutrition Explorer</h1>
+    <div class="controls">
+      <strong id="rendered-count"></strong>/<strong id="data-count"></strong>
+      <div class="fillbar"><div id="selected-bar"><div id="rendered-bar">&nbsp;</div></div></div>
+      Lines at <strong id="opacity"></strong> opacity.
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div id="chart">
+    <canvas id="background"></canvas>
+    <canvas id="foreground"></canvas>
+    <canvas id="highlight"></canvas>
+    <svg></svg>
+  </div>
+  <div id="list" class="list">
+      <h3>Sample of 25 entries <input type="text" id="search" placeholder="Search Foods..."></input></h3>
+      <p id="food-list">
+      </p>
+  </div>
+  </body>
+  <script src="http://underscorejs.org/underscore.js"></script>
+  <script src="parallel.js"></script>
+</html>
