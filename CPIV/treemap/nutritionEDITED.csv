@@ -1,0 +1,40 @@
+parent,child,quantity
+Vegetables,vegetables,109
+Meat,beef,56
+Meat,chicken,35
+Meat,lamb,16
+Meat,pork,23
+Meat,turkey,26
+Meat,others,123
+Dairy,cheese,40
+Dairy,milk,24
+Dairy,yogurt,16
+Dairy,ice cream,13
+Dairy,others,39
+Others,others,395
+Fish, seafood,31
+Fish,fish,112
+Fruits,fruits,28
+Starchy food,bread,37
+Starchy food,cereals,85
+Starchy food,potatoes,17
+Starchy food,rice,21
+Starchy food,pasta,13
+Starchy food,others,150
+Fast food, burgerking,12
+Fast food, pizzahut,15
+Fast food, mcdonalds,38
+Fast food, others, 66
+Oils, oil,52
+Beverages, beverages,54
+foodtype,Vegetables,
+foodtype,Meat,
+foodtype,Dairy,
+foodtype,Others,
+foodtype,Fish,
+foodtype,Fruits,
+foodtype,Starchy food,
+foodtype,Fast food,
+foodtype,Oils,
+foodtype,Beverages,
+,foodtype,
