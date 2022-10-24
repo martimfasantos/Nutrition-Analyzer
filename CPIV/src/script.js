@@ -114,12 +114,7 @@ function createTreeMap(id) {
         .style("opacity", function(d){ return opacity(d.data.quantity)})
         .on("mouseover", (event, d) => handleMouseOver(d))
         .on("mouseleave", (event, d) => handleMouseLeave())
-        
-        //FIXME sacar o nome do parent do rectangulo para depois filtrar
-        .on("click",function(d){
-            var title = d.data.parent;
-            console.log(title);
-        });
+        .on("click", (event, d) => onClickers(d))
 
         // and to add the text labels
         svg
@@ -348,4 +343,11 @@ function getKey(data, attribute){
     var pattern = new RegExp("^" + attribute + "[\ ]");
     return keys.filter(function(k){return k.match(pattern);});
 }
-  
+
+
+function onClickers(item){
+  d3.selectAll(".TreeItemValue")
+    console.log("Category - ",item.data.parent)
+    console.log("Type - ",item.data.child)
+    console.log("Quantity - ",item.data.quantity)
+}
