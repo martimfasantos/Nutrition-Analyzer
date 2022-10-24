@@ -3,9 +3,9 @@ function init() {
 }
 
 function createTreeMap(id) {
-  margin = { top: 20, right: 30, bottom: 40, left: 90 };
-  width = 1400 - margin.left - margin.right;
-  height = 400 - margin.top - margin.bottom;
+  const margin = { top: 20, right: 30, bottom: 40, left: 90 },
+        width = 1400 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
 
   const svg = d3
     .select(id)
@@ -39,7 +39,7 @@ function createTreeMap(id) {
 
     // prepare a color scale
     var color = d3.scaleOrdinal()
-    .domain(["Vegetables", "Meat", "Dairy", "Others", "Fish", "Fruits", "Starchy food","Fast food","Oils","Beverages"])
+    .domain(["Vegetables", "Meat", "Dairy", "Others", "Fish", "Fruits", "Starchy food", "Fast food", "Oils", "Beverages"])
     .range([ "#098526", "#fa050d", "#f72ae3","#030000", "#05005c", "#011f06","#402D54", "#D18975", "#838701","#001202"])
 
     // And a opacity scale

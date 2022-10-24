@@ -1,7 +1,3 @@
-const margin = {top: 40, right: 40, bottom: 40, left: 90},
-      width = 315 - margin.left - margin.right,
-      height = 200 - margin.top - margin.bottom;
-
 const jitterWidth = 35
 const LEFT = 0,
       RIGHT = 1;
@@ -59,6 +55,10 @@ function init(){
 
 
 function createJitterPlot(attribute, category1, category2){
+  const margin = {top: 40, right: 40, bottom: 40, left: 90},
+      width = 315 - margin.left - margin.right,
+      height = 200 - margin.top - margin.bottom;
+    
   const svg = d3
     .select(`#jitterPlot-${attribute}`)
     .append("svg")
@@ -125,6 +125,10 @@ function createJitterPlot(attribute, category1, category2){
 }
 
 function updateJitterPlots(attribute, column, category1, category2){
+  const margin = {top: 40, right: 40, bottom: 40, left: 90},
+      width = 315 - margin.left - margin.right,
+      height = 200 - margin.top - margin.bottom;
+  
   d3.csv('nutrition.csv').then(function(data) {
 
     data = data.filter(function (item) {
