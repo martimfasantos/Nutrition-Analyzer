@@ -590,16 +590,16 @@ function createJitterPlot(attribute, category1, category2){
       .selectAll(`circle.indPoints-${attribute}`)
       .data(data, (d) => d.name)
       .join("circle")
-      .attr("class", `indPoints-${attribute} itemValue`)
+      .attr("class", `indPoints-${attribute} JitterItemValue`)
       .attr("cx", (d) => x(d.category) - jitterWidth/2 + Math.random()*jitterWidth ) // onde se calculam as categorias 
       .attr("cy", (d) => y(d[key]))
       .attr("r", 3.5)
       .style("fill", (d) => color(d[key]))
-      .style("stroke", "black");
-      // .on("mouseover", (event, d) => handleMouseOver(d))
-      // .on("mouseleave", (event, d) => handleMouseLeave())
-      // .append("title")
-      // .text((d) => d.title);
+      .style("stroke", "black")
+      .on("mouseover", (event, d) => handleMouseOverJitter(d))
+      .on("mouseleave", (event, d) => handleMouseLeaveJitter())
+      .append("title")
+      .text((d) => d.name);
 
     d3.csv('references.csv').then(function(rdata) {
 
@@ -666,14 +666,14 @@ function updateJitterPlots(attribute, column, category1, category2){
         (enter) => {
           circles = enter
             .append("circle")
-            .attr("class", `indPoints-${attribute} itemValue`)
+            .attr("class", `indPoints-${attribute} JitterItemValue`)
             .attr("cx", function(d){return(x(d.category) - jitterWidth/2 + Math.random()*jitterWidth )})
             .attr("cy", y(0))
             .attr("r", 4)
             .style("fill", function(d){ return(color(d[key]))})
             .style("stroke", "black")
-            // .on("mouseover", (event, d) => handleMouseOver(d))
-            // .on("mouseleave", (event, d) => handleMouseLeave());
+            .on("mouseover", (event, d) => handleMouseOverJitter(d))
+            .on("mouseleave", (event, d) => handleMouseLeaveJitter())
           circles
             .transition()
             .duration(1000)
@@ -735,6 +735,25 @@ function handleMouseLeave() {
     .style("stroke", "none");
 }
 
+function handleMouseOverJitter(item){
+  console.log("OVER");
+  console.log(d3.selectAll(".JitterItemValue").filter(function (d, i) {
+    return d.name == item.name;
+  }));
+  d3.selectAll(".JitterItemValue")
+    .filter(function (d, i) {
+      return d.name == item.name;
+    })
+    .style("stroke", colorsHEX[item.category])
+    .style("stroke-width", 10);
+}
+
+function handleMouseLeaveJitter(){
+  d3.selectAll(".JitterItemValue")
+    .style("stroke", "black")
+    .style("stroke-width", 1);
+}
+
 function getKey(data, attribute){
   var keys = Array.from(Object.keys(data[0]));
   var pattern = new RegExp("^" + attribute + "[\ ]");
@@ -752,6 +771,6 @@ function onClickTreeMap(item){
     .style("stroke", "black")
     .style("stroke-width", 2.5);
 
-selected_category = item.data.parent;
-updateAllJitterPlots(selected_category)
+  selected_category = item.data.parent;
+  updateAllJitterPlots(selected_category);
 }
