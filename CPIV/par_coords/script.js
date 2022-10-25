@@ -1,5 +1,3 @@
-// Parallel Coordinates
-
 const width = 1550,
       height = 410;
 
@@ -43,9 +41,9 @@ const categories = ["Fruits",
 const yscales = { "calories" : [0, 1000],
                   "fat" : [0, 120],
                   "protein" : [0, 70],
-                  "carbohydrates" : [0, 100],
-                  "sodium" : [0, 3000],
-                  "potassium" : [0, 1800]
+                  "carbohydrates" : [0, 110],
+                  "sodium" : [0, 5000],
+                  "potassium" : [0, 3000]
 };
 
 var selected_category = "Meat";
@@ -59,17 +57,30 @@ var optJit = {
           "potassium" : "Fish"
 };
 
-const colors = {
-  "Beverages": [10,28,67],
-  "Dairy": [325,50,39],
-  "Fast food": [60,86,61],
-  "Fish": [37,50,75],
-  "Fruits": [271,39,57],
-  "Meat": [185,56,73],
-  "Oils": [28,100,52],
-  "Others": [318,65,67],
-  "Starchy food": [30,100,73],
-  "Vegetables": [56,58,73]
+const colorsHSL = {
+  "Meat": [3,100,69],
+  "Fish": [212.1, 44.7, 63.1],
+  "Vegetables": [120, 60, 66.7],
+  "Beverages": [187,75,86],
+  "Fruits": [138.1, 96.9, 38.2],
+  "Dairy": [29, 91, 79],
+  "Fast food": [315, 61, 70],
+  "Oils": [146, 3, 54],
+  "Others": [78, 36, 73],
+  "Starchy food": [260.7, 44.5, 73.1]
+};
+
+const colorsHEX = {
+  "Meat": "#ff6961",
+  "Fish": "#779ecb",
+  "Vegetables": "#77dd77",
+  "Beverages": "#c1f0f6",
+  "Fruits": "#03c03c",
+  "Dairy": "#fac898",
+  "Fast food": "#e183c9",
+  "Oils": "#858c88",
+  "Others": "#c4d3a2",
+  "Starchy food": "#b19cd9"
 };
 
 const filters = new Map();
@@ -133,14 +144,15 @@ function createParCoords(id){
   background.lineWidth = 1.7;
   
   // SVG for ticks, labels, and interactions
-  var svg = d3.select("svg")
+  var svg = d3
+      .select("svg")
       .attr("width", w + m[1] + m[3])
       .attr("height", h + m[0] + m[2])
       .append("g")
       .attr("transform", `translate(${m[3]},${m[0]})`);
   
   // Load the data and visualization
-  d3.csv("test.csv").then(function (raw_data) {
+  d3.csv("nutrition.csv").then(function (raw_data) {
     // Convert quantitative scales to floats
     data = raw_data.map(function(d) {
       for (var k in d) {
@@ -300,7 +312,7 @@ function path(d, ctx, color) {
 };
 
 function color(d,a) {
-  var c = colors[d];
+  var c = colorsHSL[d];
   return ["hsla(",c[0],",",c[1],"%,",c[2],"%,",a,")"].join("");
 }
 
@@ -435,76 +447,81 @@ function createTreeMap(id) {
       });
 
       d3.treemap()
-      .size([width, height])
-      //.padding(0.5)
-      .paddingTop(15)
-      .paddingRight(2)
-      .paddingInner(3) 
-      (root);
+        .size([width, height])
+        //.padding(0.5)
+        .paddingTop(15)
+        .paddingRight(2)
+        .paddingInner(3) 
+        (root);
 
       // prepare a color scale
       var color = d3.scaleOrdinal()
-      .domain(["Vegetables", "Meat", "Dairy", "Others", "Fish", "Fruits", "Starchy food", "Fast food", "Oils", "Beverages"])
-      .range([ "#098526", "#fa050d", "#f72ae3","#030000", "#05005c", "#011f06","#402D54", "#D18975", "#838701","#001202"])
+                  .domain(Object.keys(colorsHEX))
+                  .range(Object.values(colorsHEX))
 
       // And a opacity scale
       var opacity = d3.scaleLinear()
-      .domain([10, 30])
-      .range([.6,1])
+                .domain([10, 35])
+                .range([0.6,1])
 
       svg
-      .selectAll("rect.rectValue")//rect.rectValue
-      .data(root.leaves())
-      .enter()
-      .append("rect")
-      .attr("class", "rectValue TreeItemValue")
-      .attr('x', function (d) { return d.x0; })
-      .attr('y', function (d) { return d.y0; })
-      .attr('width', function (d) { return d.x1 - d.x0; })
-      .attr('height', function (d) { return d.y1 - d.y0; })
-      .style("fill", function(d){ return color(d.data.parent)} )
-      .style("opacity", function(d){ return opacity(d.data.quantity)})
-      .on("mouseover", (event, d) => handleMouseOver(d))
-      .on("mouseleave", (event, d) => handleMouseLeave())
-      .on("click", (event, d) => onClickTreeMap(d))
+        .selectAll("rect.rectValue")
+        .data(root.leaves())
+        .enter()
+        .append("rect")
+          .attr("class", "rectValue TreeItemValue")
+          .attr('x', function (d) { return d.x0; })
+          .attr('y', function (d) { return d.y0; })
+          .attr('width', function (d) { return d.x1 - d.x0; })
+          .attr('height', function (d) { return d.y1 - d.y0; })
+          .style("fill", function(d){ return color(d.data.parent)} )
+          .style("opacity", function(d){ return opacity(d.data.quantity)})
+          .on("mouseover", (event, d) => handleMouseOver(d))
+          .on("mouseleave", (event, d) => handleMouseLeave())
+          .on("click", (event, d) => onClickTreeMap(d));
 
-      // and to add the text labels
+      // and to add the text labels (types)
       svg
       .selectAll("text")
       .data(root.leaves())
       .enter()
       .append("text")
-      .attr("x", function(d){ return d.x0+1})    // +10 to adjust position (more right)
-      .attr("y", function(d){ return d.y0+15})    // +20 to adjust position (lower)
-      .text(function(d){ return d.data.child })
-      .attr("font-size", "13px")
-      .attr("fill", "white")
+        .attr("x", function(d){ return d.x0+1})    // +1 to adjust position (more right)
+        .attr("y", function(d){ return d.y0+15})    // +15 to adjust position (lower)
+        .text(function(d){ return d.data.child })
+        .attr("font-size", "13px")
+        .attr("fill", "white");
 
-      // and to add the text labels
+      // and to add the text labels (quantities)
       svg
-          .selectAll("vals")
-          .data(root.leaves())
-          .enter()
-          .append("text")
-
-          .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
-          .attr("y", function(d){ return d.y0+26})    // +20 to adjust position (lower)
+        .selectAll("vals")
+        .data(root.leaves())
+        .enter()
+        .append("text")
+          .attr("x", function(d){ return d.x0+5})    // +5 to adjust position (more right)
+          .attr("y", function(d){ return d.y0+26})    // +26 to adjust position (lower)
           .text(function(d){ return d.data.quantity })
           .attr("font-size", "11px")
-          .attr("fill", "white")
+          .attr("fill", "white");
 
-      // Add title for the 3 groups
+      // Add title for the groups
       svg
       .selectAll("titles")
       .data(root.descendants().filter(function(d){return d.depth==1}))
       .enter()
       .append("text")
-      .attr("x", function(d){ return d.x0})
-      .attr("y", function(d){ return d.y0+12})
-      .text(function(d){ return d.data.child })
-      .attr("font-size", "16px")
-      // .attr("fill",  function(d){ return color(d.data.parent)} )
+        .attr("x", function(d){ return d.x0})
+        .attr("y", function(d){ return d.y0+12})
+        .text(function(d){ return d.data.child })
+        .attr("font-size", "14px")
+        .attr("font-weight", "bold")
 
+      d3.selectAll(".TreeItemValue")
+        .filter(function (d, i) {
+          return d.data.parent == selected_category;
+        })
+        .style("stroke", "black")
+        .style("stroke-width", 2.5);
       // Add title "Food Categories"
       // svg
       // .append("text")
@@ -566,7 +583,6 @@ function createJitterPlot(attribute, category1, category2){
        .attr("id", `gYAxis-${attribute}`)
        .call(d3.axisLeft(y)) 
 
-
     const color = myColor.domain(yscales[attribute].slice().reverse());
 
     // Draw the plot
@@ -584,6 +600,21 @@ function createJitterPlot(attribute, category1, category2){
       // .on("mouseleave", (event, d) => handleMouseLeave())
       // .append("title")
       // .text((d) => d.title);
+
+    d3.csv('references.csv').then(function(rdata) {
+
+      const reference = Object.keys(rdata[0]).filter((k) => k == key),
+            reference_value = rdata[0][reference]/4;
+
+      svg.append('line')
+        .style("stroke", "#ff8f16")
+        .style("stroke-width", height/180)
+        .style("stroke-dasharray", ("2, 2"))
+        .attr("x1", x(0))
+        .attr("y1", y(reference_value))
+        .attr("x2", width)
+        .attr("y2", y(reference_value))
+    });
   });
 }
 
@@ -665,21 +696,21 @@ function updateJitterPlots(attribute, column, category1, category2){
 }
 
 function updateAllJitterPlots(selected_category){
-updateJitterPlots("calories", LEFT, selected_category, optJit["calories"]);
-updateJitterPlots("fat", LEFT, selected_category, optJit["fat"]);
-updateJitterPlots("protein", LEFT, selected_category, optJit["protein"]);
-updateJitterPlots("carbohydrates", LEFT, selected_category, optJit["carbohydrates"]);
-updateJitterPlots("sodium", LEFT, selected_category, optJit["sodium"]);
-updateJitterPlots("potassium", LEFT, selected_category, optJit["potassium"]);
+  updateJitterPlots("calories", LEFT, selected_category, optJit["calories"]);
+  updateJitterPlots("fat", LEFT, selected_category, optJit["fat"]);
+  updateJitterPlots("protein", LEFT, selected_category, optJit["protein"]);
+  updateJitterPlots("carbohydrates", LEFT, selected_category, optJit["carbohydrates"]);
+  updateJitterPlots("sodium", LEFT, selected_category, optJit["sodium"]);
+  updateJitterPlots("potassium", LEFT, selected_category, optJit["potassium"]);
 }
 
 function handleMouseOver(item) {
   d3.selectAll(".TreeItemValue")
-  .filter(function (d, i) {
-    return d.data.parent == item.data.parent;
-  })
-  .style("stroke", "black")
-  .style("stroke-width", 2);
+    .filter(function (d, i) {
+      return d.data.parent == item.data.parent && item.data.parent != selected_category;
+    })
+    .style("stroke", "#454545")
+    .style("stroke-width", 2);
 
 }
 
@@ -687,8 +718,8 @@ function handleMouseLeave() {
 
   // prepare a color scale
   var color = d3.scaleOrdinal()
-  .domain(["Vegetables", "Meat", "Dairy", "Others", "Fish", "Fruits", "Starchy food","Fast food","Oils","Beverages"])
-  .range([ "#098526", "#fa050d", "#f72ae3","#030000", "#05005c", "#011f06","#402D54", "#D18975", "#838701","#001202"])
+      .domain(Object.keys(colorsHEX))
+      .range(Object.keys(colorsHEX));
 
   // And a opacity scale
   var opacity = d3.scaleLinear()
@@ -696,9 +727,12 @@ function handleMouseLeave() {
     .range([0.6,1])
 
   d3.selectAll(".TreeItemValue")
-  .style("fill", function(d){ return color(d.data.parent)} )
-  .style("opacity", function(d){ return opacity(d.data.quantity)})
-  .style("stroke", "none");
+    .filter(function (d, i) {
+      return d.data.parent != selected_category;
+    })
+    .style("fill", function(d){ return color(d.data.parent)} )
+    .style("opacity", function(d){ return opacity(d.data.quantity)})
+    .style("stroke", "none");
 }
 
 function getKey(data, attribute){
@@ -708,10 +742,15 @@ function getKey(data, attribute){
 }
 
 function onClickTreeMap(item){
-d3.selectAll(".TreeItemValue");
-console.log("Category - ",item.data.parent);
-console.log("Type - ",item.data.child);
-console.log("Quantity - ",item.data.quantity);
+  d3.selectAll(".TreeItemValue")
+  .style("stroke", "none");
+
+  d3.selectAll(".TreeItemValue")
+    .filter(function (d, i) {
+      return d.data.parent == item.data.parent;
+    })
+    .style("stroke", "black")
+    .style("stroke-width", 2.5);
 
 selected_category = item.data.parent;
 updateAllJitterPlots(selected_category)
