@@ -19,7 +19,7 @@ var m = [50, 0, 10, 0],
     brush_count = 0,
     excluded_groups = [];
 
-const jitterWidth = 35
+const jitterWidth = 20;
 const LEFT = 0,
       RIGHT = 1;
 
@@ -536,7 +536,7 @@ function createTreeMap(id) {
 
 function createJitterPlot(attribute, category1, category2){
   const margin = {top: 20, right: 40, bottom: 20, left: 90},
-      width = 300 - margin.left - margin.right,
+      width = 500 - margin.left - margin.right,
       height = 160 - margin.top - margin.bottom;
     
   const svg = d3
@@ -549,23 +549,24 @@ function createJitterPlot(attribute, category1, category2){
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
   d3.csv('nutrition.csv').then(function(data) {
-    data = data.filter(function (item) {
-      return item.category === category1 || item.category === category2;
-    });
     
     const key = getKey(data, attribute);
 
     // X scale
     const x = d3.scaleBand()
       .range([0, width])
-      .domain([category1, category2])
+      .domain(categories)
       .paddingInner(1)
       .paddingOuter(0.5);
-    // Add x axis
+
+    // Add x axis and change the pos of its ticks lables 
     svg.append("g")
       .attr("id", `gXAxis-${attribute}`)
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x))
+      .selectAll("text")  
+      .style("text-anchor", "middle")
+      .attr("transform", function(d,i) { return i%2 == 0 ? `translate(0,0)` : `translate(0,10)`; });
 
     // Title
     svg.append("text")
