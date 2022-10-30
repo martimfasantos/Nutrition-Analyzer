@@ -225,32 +225,6 @@ function render_range(selection, i, max, opacity) {
   });
 };
 
-// simple data table
-function data_table(sample) {
-  // sort by first column
-  var sample = sample.sort(function(a,b) {
-    var col = Object.keys(a)[0];
-    return a[col] < b[col] ? -1 : 1;
-  });
-
-  var table = d3.select("#food-list")
-    .html("")
-    .selectAll(".row")
-      .data(sample)
-    .enter().append("div")
-      .on("mouseover", (event, d) => highlight(d))
-      .on("mouseout", (event, d) => unhighlight());
-
-  table
-    .append("span")
-      .attr("class", "color-block")
-      .style("background", function(d) { return color(d.category, 0.85) })
-
-  table
-    .append("span")
-      .text(function(d) { return d.name; })
-}
-
 // Adjusts rendering speed 
 function optimize(timer) {
   var delta = (new Date()).getTime() - timer;
@@ -375,12 +349,6 @@ function brushed({selection}, key) {
     }) ? selected.push(d) : null;
   });
 
-  // free text search
-  var query = d3.select("#search").node().value;
-  if (query.length > 0) {
-    selected = search(selected, query);
-  }
-
   // Render selected lines
   paths(selected, foreground, brush_count, true);
 }
@@ -395,8 +363,6 @@ function paths(selected, ctx, count) {
   selection_stats(opacity, n, data.length)
 
   shuffled_data = _.shuffle(selected);
-
-  data_table(shuffled_data.slice(0,20));
 
   ctx.clearRect(0,0,w+1,h+1);
 
@@ -535,9 +501,9 @@ function createTreeMap(id) {
 }
 
 function createJitterPlot(attribute, category1, category2){
-  const margin = {top: 20, right: 40, bottom: 20, left: 90},
-      width = 500 - margin.left - margin.right,
-      height = 160 - margin.top - margin.bottom;
+  const margin = {top: 20, right: 40, bottom: 30, left: 90},
+      width = 530 - margin.left - margin.right,
+      height = 200 - margin.top - margin.bottom;
     
   const svg = d3
     .select(`#jitterPlot-${attribute}`)
@@ -620,9 +586,9 @@ function createJitterPlot(attribute, category1, category2){
 }
 
 function updateJitterPlots(attribute, column, category1, category2){
-  const margin = {top: 40, right: 40, bottom: 40, left: 90},
+  const margin = {top: 20, right: 40, bottom: 10, left: 90},
       width = 315 - margin.left - margin.right,
-      height = 200 - margin.top - margin.bottom;
+      height = 300 - margin.top - margin.bottom;
   
   // Save selected category in button
   optJit[attribute] = category2;
