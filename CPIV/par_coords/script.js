@@ -1,4 +1,4 @@
-const width = 1550,
+const width = 1450,
       height = 410;
 
 var m = [50, 0, 10, 0],
@@ -23,18 +23,15 @@ const jitterWidth = 20;
 const LEFT = 0,
       RIGHT = 1;
 
-const myColor = d3.scaleSequential()
-                  .interpolator(d3.interpolateInferno);
-
-const categories = ["Fruits",
-                    "Vegetables",
-                    "Meat",
+const categories = ["Meat",
                     "Fish",
-                    "Oils",
+                    "Fruits",
+                    "Dairy",
+                    "Vegetables",
                     "Starchy food",
                     "Fast food",
-                    "Dairy",
                     "Beverages",
+                    "Oils",
                     "Others"];
 
                     // TO ADJUST
@@ -46,16 +43,7 @@ const yscales = { "calories" : [0, 1000],
                   "potassium" : [0, 3000]
 };
 
-var selected_category = "Meat";
-
-var optJit = { 
-          "calories" : "Fish",
-          "fat" : "Fish",
-          "protein" : "Fish",
-          "carbohydrates" : "Fish",
-          "sodium" : "Fish",
-          "potassium" : "Fish"
-};
+var selected_category;
 
 const colorsHSL = {
   "Meat": [3,100,69],
@@ -88,30 +76,12 @@ const filters = new Map();
 function init(){
   createParCoords("#parCoords");
   createTreeMap("#treemap");
-  createJitterPlot("calories", selected_category, optJit["calories"]);
-  createJitterPlot("fat", selected_category, optJit["fat"]);
-  createJitterPlot("protein", selected_category, optJit["protein"]);
-  createJitterPlot("carbohydrates", selected_category, optJit["carbohydrates"]);
-  createJitterPlot("sodium", selected_category, optJit["sodium"]);
-  createJitterPlot("potassium", selected_category, optJit["potassium"]);
-  d3.select("#category-compare-calories").on("click", () => {
-      updateJitterPlots("calories", RIGHT, selected_category, document.getElementById("category-compare-calories").value);
-  });
-  d3.select("#category-compare-fat").on("click", () => {
-      updateJitterPlots("fat", RIGHT, selected_category, document.getElementById("category-compare-fat").value);
-  });
-  d3.select("#category-compare-protein").on("click", () => {
-      updateJitterPlots("protein", RIGHT, selected_category, document.getElementById("category-compare-protein").value);
-  });
-  d3.select("#category-compare-carbohydrates").on("click", () => {
-      updateJitterPlots("carbohydrates", RIGHT, selected_category, document.getElementById("category-compare-carbohydrates").value);
-  });
-  d3.select("#category-compare-sodium").on("click", () => {
-      updateJitterPlots("sodium", RIGHT, selected_category, document.getElementById("category-compare-sodium").value);
-  });
-  d3.select("#category-compare-potassium").on("click", () => {
-      updateJitterPlots("potassium", RIGHT, selected_category, document.getElementById("category-compare-potassium").value);
-  });
+  createJitterPlot("calories");
+  createJitterPlot("fat");
+  createJitterPlot("protein");
+  createJitterPlot("carbohydrates");
+  createJitterPlot("sodium");
+  createJitterPlot("potassium");
 }
 
 function createParCoords(id){
@@ -386,8 +356,8 @@ function search(selection,str) {
 
 function createTreeMap(id) {
   const margin = { top: -10, right: 0, bottom: 0, left: 40 },
-          width = 1550 - margin.left - margin.right,
-          height = 280 - margin.top - margin.bottom;
+          width = 520 - margin.left - margin.right,
+          height = 870 - margin.top - margin.bottom;
 
   const svg = d3
       .select(id)
@@ -428,7 +398,7 @@ function createTreeMap(id) {
       // And a opacity scale
       var opacity = d3.scaleLinear()
                 .domain([10, 35])
-                .range([0.6,1])
+                .range([0.5,1])
 
       svg
         .selectAll("rect.rectValue")
@@ -452,8 +422,8 @@ function createTreeMap(id) {
       .data(root.leaves())
       .enter()
       .append("text")
-        .attr("x", function(d){ return d.x0+1})    // +1 to adjust position (more right)
-        .attr("y", function(d){ return d.y0+15})    // +15 to adjust position (lower)
+        .attr("x", function(d){ return d.x0+2})    // +1 to adjust position (more right)
+        .attr("y", function(d){ return d.y0+13})    // +15 to adjust position (lower)
         .text(function(d){ return d.data.child })
         .attr("font-size", "13px")
         .attr("fill", "white");
@@ -464,8 +434,8 @@ function createTreeMap(id) {
         .data(root.leaves())
         .enter()
         .append("text")
-          .attr("x", function(d){ return d.x0+5})    // +5 to adjust position (more right)
-          .attr("y", function(d){ return d.y0+26})    // +26 to adjust position (lower)
+          .attr("x", function(d){ return d.x0+3})    // +5 to adjust position (more right)
+          .attr("y", function(d){ return d.y0+25})    // +26 to adjust position (lower)
           .text(function(d){ return d.data.quantity })
           .attr("font-size", "11px")
           .attr("fill", "white");
@@ -480,6 +450,7 @@ function createTreeMap(id) {
         .attr("y", function(d){ return d.y0+12})
         .text(function(d){ return d.data.child })
         .attr("font-size", "14px")
+        .attr("fill", "#303030")
         .attr("font-weight", "bold")
 
       d3.selectAll(".TreeItemValue")
@@ -488,22 +459,13 @@ function createTreeMap(id) {
         })
         .style("stroke", "black")
         .style("stroke-width", 2.5);
-      // Add title "Food Categories"
-      // svg
-      // .append("text")
-      // .attr("x", width/2)
-      // .attr("y", +5)
-      // .text("Food Categories")
-      // .attr("font-size", "20px")
-      // .attr("font-weight", "bold")
-      // .attr("fill",  "black" )
   });
 }
 
-function createJitterPlot(attribute, category1, category2){
-  const margin = {top: 20, right: 40, bottom: 30, left: 90},
-      width = 530 - margin.left - margin.right,
-      height = 200 - margin.top - margin.bottom;
+function createJitterPlot(attribute){
+  const margin = {top: 20, right: 40, bottom: 30, left: 40},
+      width = 480 - margin.left - margin.right,
+      height = 225 - margin.top - margin.bottom;
     
   const svg = d3
     .select(`#jitterPlot-${attribute}`)
@@ -550,8 +512,6 @@ function createJitterPlot(attribute, category1, category2){
        .attr("id", `gYAxis-${attribute}`)
        .call(d3.axisLeft(y)) 
 
-    const color = myColor.domain(yscales[attribute].slice().reverse());
-
     // Draw the plot
     svg
       .selectAll(`circle.indPoints-${attribute}`)
@@ -561,18 +521,19 @@ function createJitterPlot(attribute, category1, category2){
       .attr("cx", (d) => x(d.category) - jitterWidth/2 + Math.random()*jitterWidth ) // onde se calculam as categorias 
       .attr("cy", (d) => y(d[key]))
       .attr("r", 3.5)
-      .style("fill", (d) => color(d[key]))
-      .style("stroke", "black")
+      .style("fill", (d) => color(d.category,1))
+      .style("stroke", "#202020")
       .on("mouseover", (event, d) => handleMouseOverJitter(d))
       .on("mouseleave", (event, d) => handleMouseLeaveJitter())
       .append("title")
-      .text((d) => d.name);
+        .text((d) => d.name);
 
     d3.csv('references.csv').then(function(rdata) {
 
       const reference = Object.keys(rdata[0]).filter((k) => k == key),
             reference_value = rdata[0][reference]/4;
 
+      // Trend line
       svg.append('line')
         .style("stroke", "#ff8f16")
         .style("stroke-width", height/180)
@@ -583,92 +544,6 @@ function createJitterPlot(attribute, category1, category2){
         .attr("y2", y(reference_value))
     });
   });
-}
-
-function updateJitterPlots(attribute, column, category1, category2){
-  const margin = {top: 20, right: 40, bottom: 10, left: 90},
-      width = 315 - margin.left - margin.right,
-      height = 300 - margin.top - margin.bottom;
-  
-  // Save selected category in button
-  optJit[attribute] = category2;
-
-  d3.csv('nutrition.csv').then(function(data) {
-
-    data = data.filter(function (item) {
-      return item.category === category1 || item.category === category2;
-    });
-
-    const key = getKey(data, attribute);
-
-    console.log(category2);
-    console.log(data);
-
-    const svg = d3.select(`#gJitterPlot-${attribute}`);
-
-    // update X scale
-    const x = d3.scaleBand()
-      .range([0, width])
-      .domain([category1, category2])
-      .paddingInner(1)
-      .paddingOuter(.5);
-    svg
-      .select(`#gXAxis-${attribute}`)
-      .call(d3.axisBottom(x))
-
-    //Y scale
-    const y = d3.scaleLinear()
-      .domain(yscales[attribute])
-      .range([height, 0])
-
-    svg.select(`#gYAxis-${attribute}`).call(d3.axisLeft(y));
-
-    const color = myColor.domain(yscales[attribute].slice().reverse());
-
-    // Update the plot
-    svg
-      .selectAll(`circle.indPoints-${attribute}`)
-      .data(data, (d) => d.name)
-      .join(
-        (enter) => {
-          circles = enter
-            .append("circle")
-            .attr("class", `indPoints-${attribute} JitterItemValue`)
-            .attr("cx", function(d){return(x(d.category) - jitterWidth/2 + Math.random()*jitterWidth )})
-            .attr("cy", y(0))
-            .attr("r", 4)
-            .style("fill", function(d){ return(color(d[key]))})
-            .style("stroke", "black")
-            .on("mouseover", (event, d) => handleMouseOverJitter(d))
-            .on("mouseleave", (event, d) => handleMouseLeaveJitter())
-          circles
-            .transition()
-            .duration(1000)
-            .attr("cy", function(d){return(y(d[key]))});
-          circles.append("title").text((d) => d.name);
-        },
-        (update) => {
-          update
-            .transition()
-            .duration(1000)
-            .attr("cx", function(d){return(x(d.category) - jitterWidth/2 + Math.random()*jitterWidth )})
-            .attr("cy", function(d){return(y(d[key]))})
-            .attr("r", 3.5);
-        },
-        (exit) => {
-          exit.remove();
-        }
-      );
-  })
-}
-
-function updateAllJitterPlots(selected_category){
-  updateJitterPlots("calories", LEFT, selected_category, optJit["calories"]);
-  updateJitterPlots("fat", LEFT, selected_category, optJit["fat"]);
-  updateJitterPlots("protein", LEFT, selected_category, optJit["protein"]);
-  updateJitterPlots("carbohydrates", LEFT, selected_category, optJit["carbohydrates"]);
-  updateJitterPlots("sodium", LEFT, selected_category, optJit["sodium"]);
-  updateJitterPlots("potassium", LEFT, selected_category, optJit["potassium"]);
 }
 
 function handleMouseOver(item) {
@@ -717,7 +592,7 @@ function handleMouseOverJitter(item){
 
 function handleMouseLeaveJitter(){
   d3.selectAll(".JitterItemValue")
-    .style("stroke", "black")
+    .style("stroke", "#202020")
     .style("stroke-width", 1);
 }
 
