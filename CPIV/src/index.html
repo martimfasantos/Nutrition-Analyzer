@@ -1,95 +1,67 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Nutrition Database Explorer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
 
-<!-- Load d3.js -->
-<title>
-    JITTER PLOT
-</title>
-<script src="https://d3js.org/d3.v7.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<link rel="stylesheet" type="text/css" href="parallel.css" />
-
-<div id="header">
-    <h1>Nutrition Explorer</h1>
-    <div class="controls">
+  <div id="header">
+    <div style="width: 20%; float: left">
+      <h1>Nutrition Explorer</h1>
+    </div>
+    <div class="controls" style="width: 54%; text-align: right" >
       <strong id="rendered-count"></strong>/<strong id="data-count"></strong>
       <div class="fillbar"><div id="selected-bar"><div id="rendered-bar">&nbsp;</div></div></div>
       Lines at <strong id="opacity"></strong> opacity.
     </div>
+    <div style="width: 26%; float: left; text-align: center">
+      <h2>Categories</h2>
+    </div>
     <div style="clear:both;"></div>
   </div>
-
-<body onload="init()">
+  
+  <body onload="init()">
     <div>
-        <div style="width: 75%; float: left"><div id="treemap"></div></div>
-        <div style="width: 25%; float: left;  text-align: center;">
-            <div style="position: relative; top: 120px;">
-                <div id="jitterPlot-calories"></div>
-                <div style="width: 70%; text-align: right;">
-                    <select name="category-compare-calories" id="category-compare-calories">
-                        <option value="Meat">Meat</option>
-                        <option value="Fish" selected="selected">Fish</option>
-                        <option value="Dairy">Dairy</option>
-                        <option value="Oils">Oils</option>
-                    </select>
-                </div>
-            </div>
+      <!-- PARALLEL COORDINATES -->
+      <div style="width: 72%; float: left">
+        <div id="parCoords">
+          <canvas id="background"></canvas>
+          <canvas id="foreground"></canvas>
+          <canvas id="highlight"></canvas>
+          <svg style="position: relative; top: 0; left: 0; float: left;"></svg>
+          <!-- <svg></svg> -->
         </div>
-        <div style="width: 93.5%; float: left; text-align: right;">
+        <hr style="height: 0.4%; width:95%; color:lightgray; background-color:lightgray; text-align:left;">
+        <div>
+          <!-- CALORIES JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-calories"></div></div>
+          <!-- FAT JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-fat"></div></div>
+          <!-- PROTEIN JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-protein"></div></div>
         </div>
-    </div>
-    <div>
-        <div style="width: 20%; float: left"><div id="jitterPlot-fat"></div></div>
-        <div style="width: 20%; float: left"><div id="jitterPlot-protein"></div></div>
-        <div style="width: 20%; float: left"><div id="jitterPlot-carbohydrates"></div></div>
-        <div style="width: 20%; float: left"><div id="jitterPlot-sodium"></div></div>
-        <div style="width: 20%; float: left"><div id="jitterPlot-potassium"></div></div>
-    </div>
-    <div>
-        <div style="width: 13.5%; float: left; text-align: right;">
-            <select name="category-compare-fat" id="category-compare-fat">
-                <option value="Meat">Meat</option>
-                <option value="Fish" selected="selected">Fish</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Oils">Oils</option>
-            </select>
+        <div>
+          <!-- CARBOHYDRATES JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-carbohydrates"></div></div>
+          <!-- SODIUM JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-sodium"></div></div>
+          <!-- POTASSIUM JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-potassium"></div></div>
         </div>
-        <div style="width: 20%; float: left; text-align: right;">
-            <select name="category-compare-protein" id="category-compare-protein">
-                <option value="Meat">Meat</option>
-                <option value="Fish" selected="selected" >Fish</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Oils">Oils</option>
-            </select>
-        </div>
-        <div style="width: 20%; float: left; text-align: right;">
-            <select name="category-compare-carbohydrates" id="category-compare-carbohydrates">
-                <option value="Meat">Meat</option>
-                <option value="Fish" selected="selected">Fish</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Oils">Oils</option>
-            </select>
-        </div>
-        <div style="width: 20%; float: left; text-align: right;">
-            <select name="category-compare-sodium" id="category-compare-sodium">
-                <option value="Meat">Meat</option>
-                <option value="Fish" selected="selected">Fish</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Oils">Oils</option>
-            </select>
-        </div>
-        <div style="width: 20%; float: left; text-align: right;">
-            <select name="category-compare-potassium" id="category-compare-potassium">
-                <option value="Meat">Meat</option>
-                <option value="Fish" selected="selected">Fish</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Oils">Oils</option>
-            </select>
-        </div>
+        <hr style="height: 0.4%; width:95%; color:lightgray; background-color:lightgray; text-align:left;">
       </div>
-        
-    <script src="script.js"></script>
-    <script src="parallel.js"></script>
-    
-    </html>
-</body>
+      
+      <!-- TREEMAP -->
+      <div style="width: 20%; float: left; text-align: left;">
+        <div id="treemap"></div>
+      </div>
+    </div>
+    <div> 
+  </body>
+
+  <script src="http://underscorejs.org/underscore.js"></script>
+  <script src="script.js"></script>
+
+</html>

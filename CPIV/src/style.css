@@ -4,17 +4,51 @@ html, body {
     height: 100%;
     padding: 0;
   }
-  .list {
-    padding: 0 2%;
-    float: right;
-    width: 17%;
-    margin: 0 1%;
+  body { 
+    font-family: Ubuntu, Tahoma, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 1.4em;
+    background: #f7f7f7;
+    color: #404040;
   }
-  #chart {
+  a {
+    text-decoration: none;
+  }
+  .dark a {
+    color: #5ae;
+  }
+  svg {
+    font-family: Ubuntu, Tahoma, Helvetica, sans-serif;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    float: left;
+  }
+  #parCoords {
     position: relative;
     float: left;
   }
-
+  .jitter_container {
+    position: relative;
+    left: 1.4%;
+    margin-right: 0.33%;
+    margin-top: 0.33%;
+    text-align: center;
+    float: center;
+    width: 30%;
+    background-color: #e8e8e89a;
+    border-radius: 30px 30px 30px 30px;
+  }
+  .brush rect.extent {
+    fill: rgba(100,100,100,0.15);
+    stroke: #fff;
+  }
+  .dark .brush rect.extent {
+    fill: rgba(100,100,100,0.15);
+    stroke: #ddd;
+  }
   .brush:hover rect.extent {
     stroke: #222;
     stroke-dasharray: 5,5;
@@ -52,13 +86,6 @@ html, body {
     font-size: 12px;
     cursor: move;
     padding-bottom: 24px;
-  }
-  .dark .axis text {
-    fill: #f2f2f2;
-    text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
-  }
-  .dark .axis text.label {
-    fill: #ddd;
   }
   .quarter {
     width: 23%;
@@ -101,18 +128,6 @@ html, body {
   button#exclude-data:hover {
     color: #900;
   }
-  #food-list {
-    width: 100%;
-    height: 435px;
-    overflow-x: auto;
-    overflow-y: auto;
-    white-space: nowrap;
-  }
-  #legend {
-    text-align: left;
-    overflow-y: auto;
-    border-left: 1px solid rgba(140,140,140,0.5);
-  }
   .row {
     cursor: pointer;
   }
@@ -122,12 +137,6 @@ html, body {
   }
   .off {
     color: #999;
-  }
-  .dark .off {
-    color: #555;
-  }
-  .dark #legend {
-    border-left: 1px solid #777;
   }
   .color-block, .color-bar {
     display: inline-block;
@@ -165,20 +174,44 @@ html, body {
     padding: 6px 24px 4px;
     line-height: 24px;
   }
-  .dark #header {
-    background: #040404;
-    color: #f3f3f3;
-  }
   #header h1 {
     display: inline-block;
     margin: 0px 14px 0 0;
+  }
+  #header h2 {
+    display: inline-block;
+    margin: 0px 14px 0 0;
+    font-size: 18px;
+    font-weight: normal;
   }
   #header button {
     vertical-align: top;
   }
   .controls {
-    float: right;
+    float: left;
     height: 24px;
     line-height: 24px;
   }
   
+  /* Scrollbars */
+  
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+   
+  ::-webkit-scrollbar-track {
+    background: #ddd;
+    border-radius: 12px;
+  }
+   
+  ::-webkit-scrollbar-thumb {
+    background: #b5b5b5;
+    border-radius: 12px;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #222;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #444;
+  }
