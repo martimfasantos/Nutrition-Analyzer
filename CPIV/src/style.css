@@ -11,12 +11,6 @@ html, body {
     background: #f7f7f7;
     color: #404040;
   }
-  a {
-    text-decoration: none;
-  }
-  .dark a {
-    color: #5ae;
-  }
   svg {
     font-family: Ubuntu, Tahoma, Helvetica, sans-serif;
   }
@@ -45,10 +39,6 @@ html, body {
     fill: rgba(100,100,100,0.15);
     stroke: #fff;
   }
-  .dark .brush rect.extent {
-    fill: rgba(100,100,100,0.15);
-    stroke: #ddd;
-  }
   .brush:hover rect.extent {
     stroke: #222;
     stroke-dasharray: 5,5;
@@ -62,16 +52,10 @@ html, body {
   .background {
     fill: none;
   }
-  .dark .background {
-    fill: none;
-  }
   .axis line, .axis path {
     fill: none;
     stroke: #777;
     stroke-width: 1;
-  }
-  .dark .axis line, .dark .axis path {
-    stroke: #777;
   }
   .axis .tick {
     width: 200px;
@@ -84,68 +68,9 @@ html, body {
   }
   .axis text.label {
     font-size: 12px;
-    cursor: move;
     padding-bottom: 24px;
   }
-  .quarter {
-    width: 23%;
-    margin: 0 1%;
-  }
-  .half {
-    width: 48%;
-    margin: 0 1%;
-  }
-  h3 {
-    margin: 12px 0 9px;
-  }
-  h3 small {
-    color: #888;
-    font-weight: normal;
-  }
-  p {
-    margin: 0.6em 0;
-  }
-  small {
-    line-height: 1.2em;
-  }
-  button[disabled=disabled] {
-    color: #555 !important;
-    opacity: 0.4;
-  }
-  .settings button[disabled=disabled] {
-    display: none;
-  }
-  .dark button[disabled=disabled] {
-    opacity: 0.2;
-  }
-  button#keep-data,
-  button#exclude-data {
-    font-weight:bold
-  }
-  button#keep-data:hover {
-    color: #080;
-  }
-  button#exclude-data:hover {
-    color: #900;
-  }
-  .row {
-    cursor: pointer;
-  }
-  .row:hover {
-    font-size: 16px;
-    line-height: 1.3em;
-  }
-  .off {
-    color: #999;
-  }
-  .color-block, .color-bar {
-    display: inline-block;
-    height: 8px;
-    width: 8px;
-    margin: 1px 4px 1px 0px;
-  }
-  #rendered-bar,
-  #selected-bar {
+  #rendered-bar, #selected-bar {
     width:0%;
     font-weight: bold;
   }
@@ -191,27 +116,4 @@ html, body {
     float: left;
     height: 24px;
     line-height: 24px;
-  }
-  
-  /* Scrollbars */
-  
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-   
-  ::-webkit-scrollbar-track {
-    background: #ddd;
-    border-radius: 12px;
-  }
-   
-  ::-webkit-scrollbar-thumb {
-    background: #b5b5b5;
-    border-radius: 12px;
-  }
-  .dark ::-webkit-scrollbar-track {
-    background: #222;
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    background: #444;
   }

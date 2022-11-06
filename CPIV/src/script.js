@@ -55,17 +55,18 @@ var m = [50, 0, 10, 0],
     dragging = {},
     line = d3.line(),
     axis = d3.axisLeft().ticks(1+height/50),
-    data,
+    allData,
     foreground,
-    background,
-    highlighted,
+    // background,
+    // highlighted,
     dimensions,                           
-    legend,
     render_speed = 50,
-    brush_count = 0,
-    excluded_groups = [];
+    brush_count = 0;
     
 const filters = new Map();
+
+var parCoords;
+var filtered;
 
 /* ---------------------------------------------------------
 ----|               JITTER PLOTS VARIABLES             |----
@@ -73,16 +74,6 @@ const filters = new Map();
 const jitterWidth = 20;
 const LEFT = 0,
       RIGHT = 1;
-
-// Y-axis Jitter Plots
-const yscales = { "calories" : [0, 1000],
-                  "fat" : [0, 120],
-                  "protein" : [0, 70],
-                  "carbohydrates" : [0, 110],
-                  "sodium" : [0, 5000],
-                  "potassium" : [0, 3000]
-};
-
 
 /* ---------------------------------------------------------
 ----|                       MAIN                       |----
@@ -116,18 +107,18 @@ function createParCoords(id){
   foreground.lineWidth = 1.7;
   foreground.fillText("Loading...",w/2,h/2);
   
-  // Highlight canvas for temporary interactions
-  highlighted = document.getElementById('highlight').getContext('2d');
-  highlighted.strokeStyle = "rgba(0,100,160,1)";
-  highlighted.lineWidth = 4;
+  // // Highlight canvas for temporary interactions
+  // highlighted = document.getElementById('highlight').getContext('2d');
+  // highlighted.strokeStyle = "rgba(0,100,160,1)";
+  // highlighted.lineWidth = 4;
   
-  // Background canvas
-  background = document.getElementById('background').getContext('2d');
-  background.strokeStyle = "rgba(0,100,160,0.1)";
-  background.lineWidth = 1.7;
+  // // Background canvas
+  // background = document.getElementById('background').getContext('2d');
+  // background.strokeStyle = "rgba(0,100,160,0.1)";
+  // background.lineWidth = 1.7;
   
   // SVG for ticks, labels, and interactions
-  var svg = d3
+  parCoords = d3
       .select("svg")
       .attr("width", w + m[1] + m[3])
       .attr("height", h + m[0] + m[2])
@@ -136,7 +127,7 @@ function createParCoords(id){
   
   // Load the data and visualization
   d3.csv("nutrition.csv").then(function (raw_data) {
-    data = raw_data.map(function(d) {
+    allData = raw_data.map(function(d) {
       for (var k in d) {
         if (!_.isNaN(raw_data[0][k] - 0) && k != 'name') {
           d[k] = parseFloat(d[k]) || 0;
@@ -145,6 +136,7 @@ function createParCoords(id){
       return d;
     });
   
+    // Remove unnecessary catergories
     dimensions = Object.keys(raw_data[0]).filter(function(d) { return d != "name" && d != "type" && d != "description" && d != "category" && d != "serving_size (g)" 
     && d != "calories_daily_intake_percentage" && d != "fat_percentage" && d != "sodium_daily_intake_percentage" && d != "calcium (mg)" && d != "magnesium (mg)" && d != "protein_percentage" 
     && d != "protein_daily_intake_percentage" && d != "carbohydrate_daily_intake_percentage" && d != "alcohol" && d != "water_percentage_serving_size" && d != "caffeine (mg)"})
@@ -153,7 +145,7 @@ function createParCoords(id){
     for (i in dimensions) {
       attr = dimensions[i]
       yscale[attr] = d3.scaleLinear()
-        .domain(d3.extent(data, function(d) { return +d[attr]; }))
+        .domain([0, d3.max(allData, (d) => parseFloat(d[attr]))])
         .range([h, 0]);
     }
   
@@ -164,25 +156,25 @@ function createParCoords(id){
       .domain(dimensions);
   
     // Add a group element for each dimension.
-    var g = svg
+    var g = parCoords
         .selectAll(".dimension")
         .data(dimensions)
         .enter()
         .append("g")
         .attr("class", "dimension")
-        .attr("transform", function(d) { return `translate(${xscale(d)})`; });
+        .attr("transform", function(d){ return `translate(${xscale(d)})`; });
   
     // Add an axis and title.
     g.append("g")
       .attr("class", "axis")
       .attr("transform", `translate(0,0)`)
-      .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("y", function(d,i) { return i%2 == 0 ? -14 : -30 } )
-      .attr("x", 0)
-      .attr("class", "label")
-      .text(String)
+      .each(function(d){ d3.select(this).call(axis.scale(yscale[d])); })
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("y", function(d,i){ return i%2 == 0 ? -14 : -30 } )
+        .attr("x", 0)
+        .attr("class", "label")
+          .text((d) => d.replace(/_/g, " "));
   
     // Add and store a brush for each axis.
     g.append("g")
@@ -195,7 +187,7 @@ function createParCoords(id){
           .text("Drag up or down to brush along this axis");
   
     // Render full foreground
-    svg.call(brushed);
+    parCoords.call(brushed);
   
   });
 }
@@ -280,8 +272,8 @@ function createTreeMap(id) {
         .data(root.leaves())
         .enter()
         .append("text")
-          .attr("x", function(d){ return d.x0+3})    // +5 to adjust position (more right)
-          .attr("y", function(d){ return d.y0+25})    // +26 to adjust position (lower)
+          .attr("x", function(d){ return d.data.child != "fruits" ? d.x0+3 : d.x0+36})    // +5 to adjust position (more right)
+          .attr("y", function(d){ return d.data.child != "fruits" ? d.y0+25 : d.y0+13})    // +26 to adjust position (lower)
           .text(function(d){ return d.data.quantity })
           .attr("font-size", "11px")
           .attr("fill", "white");
@@ -297,7 +289,7 @@ function createTreeMap(id) {
         .text(function(d){ return d.data.child })
         .attr("font-size", "14px")
         .attr("fill", "#303030")
-        .attr("font-weight", "bold")
+        .attr("font-weight", "bold");
 
   });
 }
@@ -316,7 +308,7 @@ function createJitterPlot(attribute){
     .attr("id", `gJitterPlot-${attribute}`)
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  d3.csv('nutrition.csv').then(function(data) {
+  d3.csv('nutrition.csv').then( function(data) {
     
     const key = getKey(data, attribute);
 
@@ -333,8 +325,8 @@ function createJitterPlot(attribute){
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x))
       .selectAll("text")  
-      .style("text-anchor", "middle")
-      .attr("transform", function(d,i) { return i%2 == 0 ? `translate(0,0)` : `translate(0,10)`; });
+        .style("text-anchor", "middle")
+        .attr("transform", function(d,i) { return i%2 == 0 ? `translate(0,0)` : `translate(0,10)`; });
 
     // Title
     svg.append("text")
@@ -345,7 +337,7 @@ function createJitterPlot(attribute){
 
     //Y scale
     const y = d3.scaleLinear()
-      .domain(yscales[attribute])
+      .domain([0, d3.max(allData, (d) => parseFloat(d[key]))*1.05])
       .range([height, 0]);
     // Add y axis
     svg.append("g")
@@ -369,8 +361,12 @@ function createJitterPlot(attribute){
 
     d3.csv('references.csv').then(function(rdata) {
 
-      const reference = Object.keys(rdata[0]).filter((k) => k == key),
-            reference_value = rdata[0][reference]/4;
+      const reference = Object.keys(rdata[0]).filter((k) => k == key);
+      var reference_value = rdata[0][reference]/4;
+
+      if (key=="calories (kcal)"){
+        reference_value = 250;
+      }
 
       // Trend line
       svg.append('line')
@@ -385,10 +381,114 @@ function createJitterPlot(attribute){
   });
 }
 
+/* ---------------------------------------------------------
+----|                     UPDATES                      |----
+------------------------------------------------------------ */
+function updateParCoords(){
+  parCoords.call(brushed);
+}
+
+function updateAllJitterPlots(selected_category){
+  updateJitterPlot("calories");
+  updateJitterPlot("fat");
+  updateJitterPlot("protein");
+  updateJitterPlot("carbohydrates");
+  updateJitterPlot("sodium");
+  updateJitterPlot("potassium");
+}
+
+function updateJitterPlot(attribute){
+  const margin = {top: 20, right: 40, bottom: 30, left: 40},
+      width = 480 - margin.left - margin.right,
+      height = 225 - margin.top - margin.bottom;
+  
+  d3.csv('nutrition.csv').then(function(data) {
+
+    data = data.filter(function (item) {
+      return !filtered.length || filtered.some((d) => d.name == item.name);
+    });
+
+    // console.log(filtered);
+    // console.log(data);
+
+    const key = getKey(data, attribute);
+    const svg = d3.select(`#gJitterPlot-${attribute}`);
+
+    // update X scale
+    const x = d3.scaleBand()
+      .range([0, width])
+      .domain(categories)
+      .paddingInner(1)
+      .paddingOuter(0.5);
+    
+    svg
+      .select(`#gXAxis-${attribute}`)
+      .call(d3.axisBottom(x));
+
+    //Y scale
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(allData, (d) => parseFloat(d[key]))*1.05])
+      .range([height, 0])
+
+    svg.select(`#gYAxis-${attribute}`).call(d3.axisLeft(y));
+
+    // Update the plot
+    svg
+      .selectAll(`circle.indPoints-${attribute}`)
+      .data(data, (d) => d.name)
+      .join(
+        (enter) => {
+          circles = enter
+            .append("circle")
+            .attr("class", `indPoints-${attribute} JitterItemValue`)
+            .attr("cx", (d) => x(d.category)- jitterWidth/2 + Math.random()*jitterWidth) // onde se calculam as categorias 
+            .attr("cy", (d) => y(0))
+            .attr("r", 3.5)
+            .style("fill", (d) => color(d.category,1))
+            .style("stroke", "#202020")
+            .on("mouseover", (event, d) => handleMouseOverJitter(d))
+            .on("mouseleave", (event, d) => handleMouseLeaveJitter())
+            .on("click", (event, d) => onClickJitterPlot(d));
+          circles
+          .transition()
+          .duration(1000)
+          .attr("cy", (d) => y(d[key]));
+          circles.append("title").text((d) => d.name);
+        },
+        (update) => {
+          update
+            .transition()
+            .duration(400)
+            .attr("cy", (d) => y(d[key]))
+            .attr("r", 3.5);
+        },
+        (exit) => {
+          exit.remove();
+        }
+      );
+  })
+}
+
 
 /* ---------------------------------------------------------
 ----|  MOUSEOVERS / MOUSELEAVES / CLICKS / HIGHLIGHTS  |----
 ------------------------------------------------------------ */
+
+// Highlight single polyline
+function highlightParCoords(d) {
+  d3.select("#foreground").style("opacity", "0.25");
+  d3.selectAll(".row").style("opacity", function(p) { return (d.group == p) ? null : "0.3" });
+  path(d, highlighted, color(d.group,1));
+}
+
+// Remove highlight
+function unhighlightParCoords() {
+  d3.select("#foreground").style("opacity", null);
+  d3.selectAll(".row").style("opacity", null);
+  highlighted.clearRect(0,0,w,h);
+}
+
+// -------------------------------------------------
 
 function handleMouseOverTreeMap(item) {
   d3.selectAll(".TreeItemValue")
@@ -419,6 +519,7 @@ function handleMouseLeaveTreeMap() {
 
 function onClickTreeMap(item){
   const selected = highlightTreeMap(item.data.parent);
+  updateParCoords();
   if (!selected) handleMouseOverTreeMap(item);
   highlightJitterPlots(item.data.parent);
 }
@@ -460,12 +561,13 @@ function handleMouseOverJitter(item){
 
 function handleMouseLeaveJitter(){
   d3.selectAll(".JitterItemValue")
-    .style("stroke", "#202020")
+    .style("stroke", "#404040")
     .style("stroke-width", 1);
 }
 
 function onClickJitterPlot(item){
   highlightTreeMap(item.category);
+  updateParCoords();
   highlightJitterPlots(item.category);
   handleMouseOverJitter(item);
 }
@@ -474,7 +576,7 @@ function highlightJitterPlots(){
   unhighlightJitterPlots();
   d3.selectAll(".JitterItemValue")
     .filter(function (d, i) {
-      return selected_categories.includes(d.category);
+      return !selected_categories.length || selected_categories.includes(d.category);
     })
     .style("stroke", "#404040")
     .style("opacity", 1);
@@ -559,7 +661,7 @@ function position(d) {
   return v == null ? xscale(d) : v;
 }
 
-// Handles a brush event, toggling the display of foreground lines.
+// Handles a brush or select event, toggling the display of foreground lines.
 function brushed({selection}, key) {
   brush_count++;
   if (selection === null) filters.delete(key);
@@ -577,27 +679,38 @@ function brushed({selection}, key) {
     });
 
   // Get lines within extents
-  var selected = [];
-  data.map(function(d) {
+  var new_filtered = [];
+  allData.map(function(d) {
+    if (selected_categories.length && !selected_categories.includes(d.category)){
+      // console.log(selected_categories);
+      return;
+    }
     return actives.every(function(p, dimension) {
       return extents[dimension][0] >= d[p] && d[p] >= extents[dimension][1];
-    }) ? selected.push(d) : null;
+    }) ? new_filtered.push(d) : null;
   });
 
-  // Render selected lines
-  paths(selected, foreground, brush_count, true);
+  // console.log("NEW FILTERED")
+  // console.log(new_filtered);
+
+  if (new_filtered.length){
+    filtered = new_filtered;
+    updateAllJitterPlots();
+  }
+  // Render new new_filtered lines
+  paths(new_filtered, foreground, brush_count, true);
 }
 
 // render a set of polylines on a canvas
-function paths(selected, ctx, count) {
-  var n = selected.length,
+function paths(filtered, ctx, count) {
+  var n = filtered.length,
       i = 0,
       opacity = d3.min([2/Math.pow(n,0.3),1]),
       timer = (new Date()).getTime();
 
-  selection_stats(opacity, n, data.length)
+  selection_stats(opacity, n, allData.length)
 
-  shuffled_data = _.shuffle(selected);
+  shuffled_data = _.shuffle(filtered);
 
   ctx.clearRect(0,0,w+1,h+1);
 
