@@ -61,7 +61,7 @@ var m = [50, 0, 10, 0],
     allData,
     foreground,
     dimensions,                           
-    render_speed = 100,
+    render_speed = 50,
     brush_count = 0;
     
 const filters = new Map();
@@ -610,7 +610,7 @@ function render_range(selection, i, max, opacity) {
 function optimize(timer) {
   var delta = (new Date()).getTime() - timer;
   render_speed = Math.max(Math.ceil(render_speed * 30 / delta), 8);
-  render_speed = Math.min(render_speed, 300);
+  render_speed = Math.min(render_speed, 10000);
   return (new Date()).getTime();
 }
 
