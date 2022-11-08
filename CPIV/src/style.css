@@ -70,6 +70,13 @@ html, body {
     font-size: 12px;
     padding-bottom: 24px;
   }
+  .row {
+    cursor: pointer;
+  }
+  .row:hover {
+    font-size: 16px;
+    line-height: 1.3em;
+  }
   #rendered-bar, #selected-bar {
     width:0%;
     font-weight: bold;
@@ -95,7 +102,7 @@ html, body {
   }
   #header {
     border-bottom: 1px solid rgba(100,100,100,0.35);
-    background: #e2e2e2;
+    background: #DCDCDC;
     padding: 6px 24px 4px;
     line-height: 24px;
   }

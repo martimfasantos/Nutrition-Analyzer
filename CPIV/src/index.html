@@ -2,22 +2,22 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <title>Nutrition Database Explorer</title>
+    <title>VI - Project</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
 
   <div id="header">
     <div style="width: 20%; float: left">
-      <h1>Nutrition Explorer</h1>
+      <h1>Nutrition Analyzer</h1>
     </div>
-    <div class="controls" style="width: 54%; text-align: right" >
+    <div class="controls" style="width: 56%; text-align: right" >
       <strong id="rendered-count"></strong>/<strong id="data-count"></strong>
       <div class="fillbar"><div id="selected-bar"><div id="rendered-bar">&nbsp;</div></div></div>
       Lines at <strong id="opacity"></strong> opacity.
     </div>
-    <div style="width: 26%; float: left; text-align: center">
-      <h2>Categories</h2>
+    <div style="width: 24%; float: left; text-align: center">
+      <h2>All Categories & Types</h2>
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -25,7 +25,7 @@
   <body onload="init()">
     <div>
       <!-- PARALLEL COORDINATES -->
-      <div style="width: 74%; float: left">
+      <div style="width: 73%; float: left">
         <div id="parCoords">
           <!-- <canvas id="background"></canvas> -->
           <canvas id="foreground"></canvas>
@@ -52,7 +52,6 @@
         </div>
         <hr style="height: 0.4%; width:95%; color:lightgray; background-color:lightgray; text-align:left;">
       </div>
-      
       <!-- TREEMAP -->
       <div style="width: 26%; float: left; text-align: left;">
         <div id="treemap"></div>
