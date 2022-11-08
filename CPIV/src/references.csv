@@ -1,2 +1,2 @@
-,calories (kcal),protein (g),protein (kcal),carbohydrates (g),carbohydrates (kcal),fat (g),tot_fat (kcal),sat_fat (kcal),sugar (kcal),potassium (mg),sodium (mg)
-Adult,2000,84.86,300,340,1300,62.9,600,200,200,300,5000
+,calories (kcal),protein (g),protein (kcal),carbohydrates (g),carbohydrates (kcal),fat (g),fat (kcal),sat_fat (kcal),sugar (kcal),potassium (mg),sodium (mg),total (g)
+Adult,2000,84.86,340,340,1360,62.9,566,200,200,300,5000,650

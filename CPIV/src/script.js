@@ -1,6 +1,9 @@
 /* ---------------------------------------------------------
 ----|                  GLOBAL VARIABLES                |----
 ------------------------------------------------------------ */
+const windowWidth = window.innerWidth,
+      windowHeight = window.innerHeight; 
+
 const categories = ["Meat",
                     "Fish",
                     "Fruits",
@@ -44,8 +47,8 @@ const colorsHEX = {
 ----|           PARALLEL COORDINATES VARIABLES         |----
 ------------------------------------------------------------ */
 
-const width = 1450,
-      height = 410;
+const width = 0.755*windowWidth,
+      height = 0.438*windowHeight
 
 var m = [50, 0, 10, 0],
     w = width - m[1] - m[3],
@@ -57,54 +60,14 @@ var m = [50, 0, 10, 0],
     axis = d3.axisLeft().ticks(1+height/50),
     allData,
     foreground,
-    // background,
-    // highlighted,
     dimensions,                           
-    render_speed = 50,
+    render_speed = 100,
     brush_count = 0;
     
 const filters = new Map();
 
 var parCoords;
 var filtered;
-
-/* ---------------------------------------------------------
-----|                 TREE MAP VARIABLES               |----
------------------------------------------------------------- */
-var treeMap;
-var root;
-var svgTreeMap;
-
-const types = [
-              "vegetables",
-              "beef",
-              "chicken",
-              "lamb",
-              "pork",
-              "turkey",
-              "others",
-              "cheese",
-              "milk",
-              "yogurt",
-              "ice cream",
-              "others",
-              "others",
-              "seafood",
-              "fish",
-              "fruits",
-              "bread",
-              "cereals",
-              "potatoes",
-              "rice",
-              "pasta",
-              "others",
-              "burgerking",
-              "pizzahut",
-              "mcdonalds",
-              "others",
-              "oil",
-              "beverages"
-              ]
 
 /* ---------------------------------------------------------
 ----|               JITTER PLOTS VARIABLES             |----
@@ -145,16 +108,6 @@ function createParCoords(id){
   foreground.lineWidth = 1.7;
   foreground.fillText("Loading...",w/2,h/2);
   
-  // // Highlight canvas for temporary interactions
-  // highlighted = document.getElementById('highlight').getContext('2d');
-  // highlighted.strokeStyle = "rgba(0,100,160,1)";
-  // highlighted.lineWidth = 4;
-  
-  // // Background canvas
-  // background = document.getElementById('background').getContext('2d');
-  // background.strokeStyle = "rgba(0,100,160,0.1)";
-  // background.lineWidth = 1.7;
-  
   // SVG for ticks, labels, and interactions
   parCoords = d3
       .select("svg")
@@ -163,7 +116,7 @@ function createParCoords(id){
       .append("g")
       .attr("transform", `translate(${m[3]},${m[0]})`);
   
-  // Load the data and visualization
+  // Load the data
   d3.csv("nutrition.csv").then(function (raw_data) {
     allData = raw_data.map(function(d) {
       for (var k in d) {
@@ -237,10 +190,10 @@ function createParCoords(id){
 
 function createTreeMap(id) {
   const margin = { top: -10, right: 0, bottom: 0, left: 48},
-          width = 510 - margin.left - margin.right,
-          height = 880 - margin.top - margin.bottom;
+        width = 0.266*windowWidth - margin.left - margin.right,
+        height = 0.939*windowHeight - margin.top - margin.bottom;
 
-  svgTreeMap = d3
+  const svgTreeMap = d3
       .select(id)
       .append("svg")
       .attr("width", width + margin.left + margin.right)
@@ -250,7 +203,7 @@ function createTreeMap(id) {
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
   d3.csv("nutritionTreeMap.csv").then(function (data) {
-    root = d3
+    const root = d3
       .stratify()
       .id(function (d) {
         return d.child;
@@ -264,7 +217,7 @@ function createTreeMap(id) {
       return d.quantity;
     });
 
-    treeMap = d3.treemap()
+    const treeMap = d3.treemap()
       .size([width, height])
       .paddingTop(15)
       .paddingRight(2)
@@ -333,14 +286,13 @@ function createTreeMap(id) {
       .attr("font-size", "14px")
       .attr("fill", "#303030")
       .attr("font-weight", "bold");
-
   });
 }
 
 function createJitterPlot(attribute){
   const margin = {top: 20, right: 40, bottom: 30, left: 40},
-      width = 480 - margin.left - margin.right,
-      height = 225 - margin.top - margin.bottom;
+      width = 0.25*windowWidth - margin.left - margin.right,
+      height = 0.24*windowHeight - margin.top - margin.bottom;
     
   const svg = d3
     .select(`#jitterPlot-${attribute}`)
@@ -405,10 +357,15 @@ function createJitterPlot(attribute){
     d3.csv('references.csv').then(function(rdata) {
 
       const reference = Object.keys(rdata[0]).filter((k) => k == key);
-      var reference_value = rdata[0][reference]/4;
+      const total = getKey(rdata, "total");
+      var reference_value;
 
-      if (key=="calories (kcal)"){
-        reference_value = 250;
+      if (reference == "sodium (mg)"){
+        reference_value = rdata[0][reference]/5;
+      } else if (reference == "potassium (mg)") {
+        reference_value = rdata[0][reference]/2;
+      } else {
+        reference_value = rdata[0][reference] * 100 / rdata[0][total[0]];
       }
 
       // Trend line
@@ -442,8 +399,9 @@ function updateAllJitterPlots(){
 
 function updateJitterPlot(attribute){
   const margin = {top: 20, right: 40, bottom: 30, left: 40},
-      width = 480 - margin.left - margin.right,
-      height = 225 - margin.top - margin.bottom;
+      width = 0.25*windowWidth - margin.left - margin.right,
+      height = 0.24*windowHeight - margin.top - margin.bottom;
+
   d3.csv('nutrition.csv').then(function(data) {
 
     data = data.filter(function (item) {
@@ -497,7 +455,7 @@ function updateJitterPlot(attribute){
         (update) => {
           update
             .transition()
-            .duration(500)
+            .duration(700)
             .attr("cy", (d) => y(d[key]))
             .attr("r", 3.5);
         },
@@ -595,7 +553,7 @@ function handleMouseOverJitter(item){
     .style("stroke", colorsHEX[item.category])
     .style("stroke-width", 10)
     .append("title")
-      .text((d) => selected_categories.includes(d.category) ? 
+      .text((d) => !selected_categories.length || selected_categories.includes(d.category) ? 
                    d.name : "Press to select the Category");
 }
 
@@ -603,13 +561,15 @@ function handleMouseLeaveJitter(){
   d3.selectAll(".JitterItemValue")
     .style("stroke", "#404040")
     .style("stroke-width", 1);
+  
+  d3.selectAll("title")
+    .remove();
 }
 
 function onClickJitterPlot(item){
   highlightTreeMap(item.category);
   updateParCoords();
   highlightJitterPlots();
-  handleMouseOverJitter(item);
 }
 
 function highlightJitterPlots(){
@@ -619,6 +579,7 @@ function highlightJitterPlots(){
       return !selected_categories.length || selected_categories.includes(d.category);
     })
     .style("stroke", "#404040")
+    .style("stroke-width", 1)
     .style("opacity", 1);
 }
 
@@ -727,14 +688,15 @@ function brushed({selection}, key) {
   });
   
   var selectedFiltered = [];
+
   // if (new_filtered.length){
-    filtered = new_filtered;
-    filtered.forEach(function (d){
-      return selected_categories.length && selected_categories.includes(d.category) ? 
-                    selectedFiltered.push(d) : null;
-    });
-    // Other updates
-    updateAllJitterPlots();
+  filtered = new_filtered;
+  filtered.forEach(function (d){
+    return selected_categories.length && selected_categories.includes(d.category) ? 
+                  selectedFiltered.push(d) : null;
+  });
+  // Other updates
+  updateAllJitterPlots();
   // }
   
   // Render new selected_filter lines
