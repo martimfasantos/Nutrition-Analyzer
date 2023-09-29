@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>VI - Project</title>
+    <script src="d3.v7.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <div id="header">
+    <div style="width: 20%; float: left">
+      <h1>Nutrition Analyzer - InfoVis</h1>
+    </div>
+    <div class="controls" style="width: 56%; text-align: right" >
+      <strong id="rendered-count"></strong>/<strong id="data-count"></strong>
+      <div class="fillbar"><div id="selected-bar"><div id="rendered-bar">&nbsp;</div></div></div>
+      Lines at <strong id="opacity"></strong> opacity.
+    </div>
+    <div style="width: 24%; float: left; text-align: center">
+      <h2>All Categories & Types</h2>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  
+  <body onload="init()">
+    <div>
+      <!-- PARALLEL COORDINATES -->
+      <div style="width: 73%; float: left">
+        <div id="parCoords">
+          <!-- <canvas id="background"></canvas> -->
+          <canvas id="foreground"></canvas>
+          <!-- <canvas id="highlight"></canvas> -->
+          <svg style="position: relative; top: 0; left: 0; float: left;"></svg>
+          <!-- <svg></svg> -->
+        </div>
+        <hr style="height: 0.4%; width:95%; color:lightgray; background-color:lightgray; text-align:left;">
+        <div>
+          <!-- CALORIES JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-calories"></div></div>
+          <!-- FAT JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-fat"></div></div>
+          <!-- PROTEIN JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-protein"></div></div>
+        </div>
+        <div>
+          <!-- CARBOHYDRATES JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-carbohydrates"></div></div>
+          <!-- SODIUM JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-sodium"></div></div>
+          <!-- POTASSIUM JITTER -->
+          <div class="jitter_container" style="width: 33%; text-align: center; float: left"><div id="jitterPlot-potassium"></div></div>
+        </div>
+        <hr style="height: 0.4%; width:95%; color:lightgray; background-color:lightgray; text-align:left;">
+      </div>
+      <!-- TREEMAP -->
+      <div style="width: 26%; float: left; text-align: left;">
+        <div id="treemap"></div>
+      </div>
+    </div>
+    <div> 
+  </body>
+
+  <script src="underscore.js"></script>
+  <script src="script.js"></script>
+
+</html>
